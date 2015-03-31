@@ -1,0 +1,18 @@
+<?php
+/**
+ * @file
+ * Install, update, and uninstall functions for the field_uconnect_subject module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function field_uconnect_subject_field_schema($field) {
+  $columns = array(
+    'options' => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+  );
+
+  return array(
+    'columns' => $columns,
+  );
+}

@@ -1,0 +1,90 @@
+<?php
+/**
+ * @file
+ * Provide UCARConnect controlled vocabulary terms
+ */
+
+/**
+ * Implements hook_field_info().
+ */
+function field_uconnect_subject_field_info() {
+	return array(
+		'field_uconnect_subject' => array(
+			'label' => t('UCARConnect Subject'),
+			'description' => t('UCARConnect Subject.'),
+			'default_widget' => 'options_select',
+			'default_formatter' => 'states_field_options',
+		), );
+}
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function field_uconnect_subject_field_widget_info_alter(&$info) {
+	$widgets = array('options_select' => array('field_uconnect_subject'), );
+	foreach ($widgets as $widget => $field_types) {
+		$info[$widget]['field types'] = array_merge($info[$widget]['field types'], $field_types);
+	}
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function field_uconnect_subject_field_is_empty($item, $field) {
+  return empty($item['options']);	
+}
+/**
+ * Implements hook_options_list().
+ */
+function field_uconnect_subject_options_list($field, $instance, $entity_type, $entity) {
+	$data = variable_get('uconnect_subject_master');
+	$a_temp = array();
+	foreach($data as $index=>$values){
+		$a_temp[$index] = $values['name'];
+		if(is_array($values['children']) && count($values['children'] != 0)){
+			foreach($values['children'] as $index2=>$values2){
+				$a_temp[$index2] = '-'.$values2['name'];
+			
+			  	if(is_array($values2['children']) && count($values2['children'] != 0)){
+					foreach($values2['children'] as $index3=>$values3){
+						$a_temp[$index3] = '--'.$values3['name'];
+					}
+				}				
+			}			
+		}		
+	}
+
+	return $a_temp;
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function field_uconnect_subject_field_formatter_info() {
+	return array('field_uconnect_subject_default' => array(
+			'label' => t('Default'),
+			'field types' => array('field_uconnect_subject'),
+		), );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function field_uconnect_subject_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+	$element = array();
+
+	switch ($display['type']) {
+		case 'field_uconnect_subject_default' :
+			foreach ($items as $delta => $item) {
+				if (isset($item['options'])) {
+					$output = field_filter_xss($item['options']);
+				}
+				else {
+					$output = "Not Supplied";
+				}
+				$element[$delta] = array('#markup' => $output);
+			}
+			break;
+	}
+
+	return $element;
+}
